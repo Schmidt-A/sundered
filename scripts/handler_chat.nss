@@ -5,33 +5,23 @@
 //:: https://github.com/NWNX/nwnx2-linux/blob/master/plugins/chat/nwn/chat_script.nss.sample
 //:://////////////////////////////////////////////
 
+#include "chat_commands"
 #include "nwnx_chat"
 
 // Format : CHAT_[LEVL]:[SOURCE] | [DESTINATION] | [MESSAGE]
 
-void main()
+void log(string sText, int iMode, int iTo)
 {
-    // speaking object
-    object oPC = OBJECT_SELF;
-    object oPCn;
-    // get text
-    SetLocalString(oPC, "NWNX!CHAT!TEXT", dmb_GetSpacer());
-    string sText = GetLocalString(oPC, "NWNX!CHAT!TEXT");
-    int nMode = StringToInt(GetStringLeft(sText,2));
-    int nTo = StringToInt(GetSubString(sText,2,10));
-    // trim 12 off the front to get rid of the mode data
-    sText = dmb_GetStringFrom(sText, 12);
-
     // Portion of format : CHAT_[LEVL]:[SOURCE] |
-    string sMsg = "CHAT_" + dmb_getChannelText(nMode) + ": (";
+    string sMsg = "CHAT_" + dmb_getChannelText(iMode) + ": (";
     sMsg += GetPCPlayerName(OBJECT_SELF) + ") " + GetName(OBJECT_SELF) + " | ";
 
     // Portion of format : [DESTINATION]
-    if (nMode == CHAT_CHANNEL_TALK || nMode == CHAT_CHANNEL_WHISPER)
+    if (iMode == CHAT_CHANNEL_TALK || iMode == CHAT_CHANNEL_WHISPER)
     {
-        int nIdx = 1;
+        int iIdx = 1;
         float fDst = 3.0;
-        if (nMode == CHAT_CHANNEL_TALK)
+        if (iMode == CHAT_CHANNEL_TALK)
             fDst = 10.0;
 
         // consider all players within fDst to be [DESTINATION]
@@ -47,9 +37,9 @@ void main()
                 break;
         }
     }
-    else if (nMode == CHAT_CHANNEL_SHOUT)
+    else if (iMode == CHAT_CHANNEL_SHOUT)
         sMsg += "(ALL)";
-    else if (nMode == CHAT_CHANNEL_PARTY)
+    else if (iMode == CHAT_CHANNEL_PARTY)
     {
         oPCn = GetFirstFactionMember(OBJECT_SELF, TRUE);
         while (GetIsObjectValid(oPCn))
@@ -58,9 +48,9 @@ void main()
             oPCn = GetNextFactionMember(OBJECT_SELF, TRUE);
         }
     }
-    else if (nMode == CHAT_CHANNEL_PRIVATE)
+    else if (iMode == CHAT_CHANNEL_PRIVATE)
     {
-        oPCn = dmb_getPC(nTo);
+        oPCn = dmb_getPC(iTo);
         sMsg += "(" + GetPCPlayerName(oPCn) + ") " + GetName(oPCn);
     }
     else
@@ -80,7 +70,53 @@ void main()
 
     // The internet never forgets
     WriteTimestampedLogEntry(sMsg + sText);
+}
 
+void main()
+{
+    // speaking object
+    object oPC = OBJECT_SELF;
+    object oPCn;
+
+    // get text
+    SetLocalString(oPC, "NWNX!CHAT!TEXT", dmb_GetSpacer());
+    string sText = GetLocalString(oPC, "NWNX!CHAT!TEXT");
+    int iMode	 = StringToInt(GetStringLeft(sText,2));
+    int iTo 	 = StringToInt(GetSubString(sText,2,10));
+
+    // trim 12 off the front to get rid of the mode data
+    sText = dmb_GetStringFrom(sText, 12);
+
+    // Chat command
+    if(GetSubString(sText, 0, 1) == "/")
+    {
+    	if(GetSubString(sText, 1, 4) == "roll")
+	{
+	    RollCommand(oPC, GetStringRight(sText, 6));
+	}
+	else if(GetSubString(sText, 1, 6)== "social")
+	{
+	    SocialCommand(oPC, GetStringRight(sText, 8));
+	}
+	else if(GetSubString(sText, 1, 4) == "help")
+	{
+	    HelpCommand(oPC, GetStringRight(sText, 6));
+	}
+	else if(GetSubString(sText, 1, 5) == "emote")
+	{
+	    EmoteCommand(oPC, GetStringRight(sText, 7));
+	}
+	else
+	{
+	    invalid(oPC, sText);
+	}
+
+	SetLocalString(oPC, "NWNX!CHAT!SUPRESS", "1");
+    }
+
+    // Log this message
+    log(sText, iMode, iTo);
+    
     // remove garbage
     DeleteLocalString(oPC, "NWNX!CHAT!TEXT");
     DeleteLocalString(oPC, "NWNX!CHAT!SUPRESS");
