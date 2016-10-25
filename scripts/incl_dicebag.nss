@@ -35,7 +35,7 @@ int d4()
   - The PC's Intimidate check;
   - The PC's Persuade check; OR
   - The PC's Will Save + their Wisdom modifier
-  Plus their d20 roll.
+  Plus their d10 roll.
 */
 int GetOpposedSocialSkillCheck(object oPC)
 {
@@ -68,3 +68,13 @@ int DBGetSkillConst(string sSkillName)
     return -1;
 }
 
+int DBGetAbilityConst(string sAbilityName)
+{
+    SQLExecDirect("SELECT engine_value FROM lookup_abilities " +
+    	"WHERE string_ref = " + sAbilityName + ";");
+
+    if(SQLFetch() == SQL_SUCCESS)
+	return SQLGetData(1);
+
+    return -1;
+}

@@ -1,7 +1,9 @@
 #include "x0_i0_stringlib"
+
+#include "nwnx_chat"
+
 #include "core_utilities"
 #include "incl_dicebag"
-#include "nwnx_chat"
 
 
 void DoSocialCheck(object oUser, object oTarget, string sSkill)
@@ -62,13 +64,53 @@ void DoSocialCheck(object oUser, object oTarget, string sSkill)
 
 void RollCommand(object oUser, string sText)
 {
+     int iConst, iMod;
+     string sNormalized = GetStringLowerCase(sText); 
+     int iIdx = -1;
 
+     // Ability score roll
+     iIdx = FindSubString("strength dexterity constitution intelligence wisdom charisma", sNormalized);
+     if(iIdx >= -1)
+     {
+	iConst = DBGetAbilityConst(sNormalized);
+	if(iConst < 0)
+	{
+	    SendMessagetoPC(oUser, "Roll command failed - could not find roll " + 
+		"option " + sText);
+	    return;
+	}
+	iMod = GetAbilityModifier(iConst, oUser);
+     }
+
+     // Save roll          0         10     17
+     iIdx = FindSubString("fortitude reflex will");
+     switch(iIdx)
+     {
+         case 0:  iMod = GetFortitudeSavingThrow(oUser); break;
+	 case 10: iMod = GetReflexSavingThrow(oUser)   ; break;
+	 case 17: iMod = GetWillSavingThrow(oUser)     ; break;
+     }
+
+     // Must be a skill roll. TODO: Probably a cleaner way of doing this
+     if(iIdx < 0)
+     {
+	iConst = DBGetSkillConst(sNormalized);
+	if(iConst < 0)
+	{
+	    SendMessagetoPC(oUser, "Roll command failed - could not find roll " + 
+		"option " + sText);
+	    return;
+	}
+	iMod = GetSkillRank(iConst, oUser);
+     }
+
+     // TODO: finish rolling stuff now that we have modifier
 }
 
-/* Expects a string of the format
+/* Expects sText to be of the format
    [social roll] (target)
    
-   Where [social skill] can be: bluff, intimidate, or persuade
+   Where [social skill] must be: bluff, intimidate, or persuade
    and (target) can be either a PC name or all 
 
    intimidate and persuade can be used selectively on targets, but bluff
@@ -82,6 +124,10 @@ void SocialCommand(object oUser, string sText, int iChannel)
     string sTarget = "";
     object oTarget;
 
+    float fRange = 50.0;
+    if(iChannel == CHAT_CHANNEL_WHISPER)
+        fRange = 10.0;
+	
     struct sStringTokenizer sParams = GetStringTokenizer(sText, " ");
 
     while(HasMoreTokens(sParams))
@@ -98,9 +144,6 @@ void SocialCommand(object oUser, string sText, int iChannel)
 
     if(sSkill == "bluff" || sTarget == "")
     {
-    	float fRange = 50.0;
-	if(iChannel == CHAT_CHANNEL_WHISPER)
-	    fRange = 10.0;
 
     	location lUserLoc = GetLocation(oUser);
 	oTarget = GetFirstObjectInShape(SHAPE_SPHERE, fRange, lUserLoc);
@@ -122,7 +165,8 @@ void SocialCommand(object oUser, string sText, int iChannel)
     	// TODO: handle first name
 	oTarget = GetPCByName(sTarget);
 
-	if(!GetObjectSeen(oUser, oTarget))
+	if(!GetObjectSeen(oUser, oTarget) || 
+		GetDistanceBetween(oUser, oTarget) > fRange)
 	{
 	    SendMessageToPC(oUser, "Social command failed - not close enough " +
 	    	"to " + sTarget + ".");
