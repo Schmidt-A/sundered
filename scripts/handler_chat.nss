@@ -96,7 +96,7 @@ void main()
 	}
 	else if(GetSubString(sText, 1, 6)== "social")
 	{
-	    SocialCommand(oPC, GetStringRight(sText, 8));
+	    SocialCommand(oPC, GetStringRight(sText, 8), iMode);
 	}
 	else if(GetSubString(sText, 1, 4) == "help")
 	{

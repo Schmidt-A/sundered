@@ -1,47 +1,8 @@
 #include "x0_i0_stringlib"
 #include "core_utilities"
+#include "incl_dicebag"
+#include "nwnx_chat"
 
-
-// ------------------ Helper Functions ---------------------
-
-/* Returns an opposed social skill check. This will be whichever is highest:
-  - The PC's Bluff check;
-  - The PC's Intimidate check;
-  - The PC's Persuade check; OR
-  - The PC's Will Save + their Wisdom modifier
-  Plus their d20 roll.
-*/
-int GetOpposedSocialSkillCheck(object oPC)
-{
-    int iRoll  = Random(20) + 1;
-    // TODO: Scaling cap on this sense motive modifier
-    int iMod   = GetWillSavingThrow(oPC) + GetAbilityModifier(ABILITY_WISDOM, oPC);
-    int iSkill = GetSkillRank(SKILL_BLUFF, oPC);                                
-
-    if(iSkill > iMod)                                                           
-        iMod = iSkill;        
-                                                  
-    iSkill = GetSkillRank(SKILL_INTIMIDATE, oPC);                               
-    if(iSkill > iMod)                                                           
-        iMod = iSkill;                                                          
-
-    iSkill = GetSkillRank(SKILL_PERSUADE, oPC);                                 
-    if(iSkill > iMod)                                                           
-        iMod = iSkill;                                                          
-                                                                                
-    return iRoll + iMod;  
-}
-
-// TODO: DB this up
-int SkillRankFromString(string sSkillName)
-{
-    if(sSkillName == "bluff")
-	return SKILL_BLUFF;
-    if(sSkillName == "intimidate")
-        return SKILL_INTIMIDATE;
-    if(sSkillName == "persuade")
-	return SKILL_PERSUADE;
-}
 
 void DoSocialCheck(object oUser, object oTarget, string sSkill)
 {
@@ -53,7 +14,15 @@ void DoSocialCheck(object oUser, object oTarget, string sSkill)
 	return;
     }
 
-    int iCheck = (Random(20) + 1) + GetSkillRank(SkillRankFromString(sSkill), oUser);
+    int iSkillConst = DBGetSkillConst(sSkill);
+    if(iSkillConst < 0)
+    {
+    	SendMessageToPC(oUser, "Social command failed - did not understand " + 
+		"skill " + sSkill);
+	return;
+    }
+
+    int iCheck = d10() + GetSkillRank(iSkillConst, oUser);
     int iOpposed = GetOpposedSocialSkillCheck(oTarget, sSkill);
     int iDifference = iCheck - iOpposed; // positive = user won
 
@@ -97,38 +66,76 @@ void RollCommand(object oUser, string sText)
 }
 
 /* Expects a string of the format
-   [social roll] [target]
+   [social roll] (target)
    
    Where [social skill] can be: bluff, intimidate, or persuade
-   and [target] can be either a PC name or all 
+   and (target) can be either a PC name or all 
 
-   Examples: bluff Miriam, intimidate all
+   intimidate and persuade can be used selectively on targets, but bluff
+   must be used on all who can hear.
+
+   Examples: bluff, intimidate Miriam
 */
-void SocialCommand(object oUser, string sText)
+void SocialCommand(object oUser, string sText, int iChannel)
 {
-    string sSkill  = GetStringLowerCase(GetTokenByPosition(sText, " ", 0));
-    string sTarget = GetStringLowerCase(GetTokenByPosition(sText, " ", 1));
+    string sSkill  = "";
+    string sTarget = "";
     object oTarget;
 
-    if(sTarget == "all")
+    struct sStringTokenizer sParams = GetStringTokenizer(sText, " ");
+
+    while(HasMoreTokens(sParams))
     {
+	if(sSkill == "");
+	    sSkill = GetStringLowerCase(GetNextToken(sParams));
+	else
+	{
+	    sTarget = GetStringLowerCase(GetNextToken(sParams));
+	    break;
+	}
+	sParams = AdvanceToNextToken(sParams);
+    }
+
+    if(sSkill == "bluff" || sTarget == "")
+    {
+    	float fRange = 50.0;
+	if(iChannel == CHAT_CHANNEL_WHISPER)
+	    fRange = 10.0;
+
     	location lUserLoc = GetLocation(oUser);
-	oTarget = GetFirstObjectInShape(SHAPE_SPHERE, 50.0, lUserLoc);
+	oTarget = GetFirstObjectInShape(SHAPE_SPHERE, fRange, lUserLoc);
 
 	while(GetIsObjectValid(oTarget))
 	{
 	    if(!GetIsPC(oTarget))
 	        continue;
+
+	    if(!GetObjectSeen(oUser, oTarget))
+	        continue;
 	    
 	    DoSocialCheck(oUser, oTarget, sSkill);
-	    oTarget = GetNextObjectInShape(SHAPE_SPHERE, 50.0, lUserLoc);
+	    oTarget = GetNextObjectInShape(SHAPE_SPHERE, fRange, lUserLoc);
 	}
     }
-    else
+    else if(sSkill != "bluff" && sTarget != "")
     {
     	// TODO: handle first name
 	oTarget = GetPCByName(sTarget);
+
+	if(!GetObjectSeen(oUser, oTarget))
+	{
+	    SendMessageToPC(oUser, "Social command failed - not close enough " +
+	    	"to " + sTarget + ".");
+	    return;
+	}
+
 	DoSocialCheck(oUser, oTarget, sSkill);
+    }
+    else
+    {
+	SendMessageToPC(oUser, "Social command failed - failed to understand " + 
+		"command '" +sText + "'."
+	return;
     }
 }
 
