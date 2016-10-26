@@ -11,11 +11,48 @@ string TOKEN_VAR = "oPCToken";
 string TOKEN_TAG = "token_pc";
 
 // ----------------- Private Functions ----------------------
+
+int GetIntValue(object oPC, string sField)
+{
+    object oPCToken = GetLocalObject(oPC, TOKEN_VAR);
+    return GetLocalInt(oPCToken, sField);
+}
+
+object GetObjectValue(object oPC, string sField)
+{
+    object oPCToken = GetLocalObject(oPC, TOKEN_VAR);
+    return GetLocalObject(oPCToken, sField);
+}
+
+string GetStringValue(object oPC, string sField)
+{
+    object oPCToken = GetLocalObject(oPC, TOKEN_VAR);
+    return GetLocalString(oPCToken, sField);
+}
+
 void SetIntValue(object oPC, string sField, int iValue)
 {
     object oPCToken = GetLocalObject(oPC, TOKEN_VAR);
 
     SetLocalInt(oPCToken, sField, iValue);
+
+    SetLocalObject(oPC, TOKEN_VAR, oPCToken);
+}
+
+void SetObjectValue(object oPC, string sField, object oTag)
+{
+    object oPCToken = GetLocalObject(oPC, TOKEN_VAR);
+
+    SetLocalObject(oPCToken, sField, oTag);
+
+    SetLocalObject(oPC, TOKEN_VAR, oPCToken);
+}
+
+void SetStringValue(object oPC, string sField, string sValue)
+{
+    object oPCToken = GetLocalObject(oPC, TOKEN_VAR);
+
+    SetLocalString(oPCToken, sField, sValue);
 
     SetLocalObject(oPC, TOKEN_VAR, oPCToken);
 }
@@ -26,21 +63,6 @@ void UpdateIntValue(object oPC, string sField, int iAmount)
     int iLocalInt = GetLocalInt(oPCToken, sField);
 
     SetLocalInt(oPCToken, sField, iLocalInt + iAmount);
-
-    SetLocalObject(oPC, TOKEN_VAR, oPCToken);
-}
-
-int GetIntValue(object oPC, string sField)
-{
-    object oPCToken = GetLocalObject(oPC, TOKEN_VAR);
-    return GetLocalInt(oPCToken, sField);
-}
-
-void SetStringValue(object oPC, string sField, string sValue)
-{
-    object oPCToken = GetLocalObject(oPC, TOKEN_VAR);
-
-    SetLocalString(oPCToken, sField, sValue);
 
     SetLocalObject(oPC, TOKEN_VAR, oPCToken);
 }
@@ -56,27 +78,6 @@ void UpdateStringValue(object oPC, string sField, string sValue, string sDelim =
         SetLocalString(oPCToken, sField, sValue);
 
     SetLocalObject(oPC, TOKEN_VAR, oPCToken);
-}
-
-string GetStringValue(object oPC, string sField)
-{
-    object oPCToken = GetLocalObject(oPC, TOKEN_VAR);
-    return GetLocalString(oPCToken, sField);
-}
-
-void SetObjectValue(object oPC, string sField, object oTag)
-{
-    object oPCToken = GetLocalObject(oPC, TOKEN_VAR);
-
-    SetLocalObject(oPCToken, sField, oTag);
-
-    SetLocalObject(oPC, TOKEN_VAR, oPCToken);
-}
-
-object GetObjectValue(object oPC, string sField)
-{
-    object oPCToken = GetLocalObject(oPC, TOKEN_VAR);
-    return GetLocalObject(oPCToken, sField);
 }
 
 string GetFirstName(object oPC)
@@ -105,6 +106,7 @@ void InitializeFlag(object oPC, string sField, int bFlag=TRUE)
 
 
 // ----------------- Core Functions ---------------------------
+
 void PCDSetupNewToken(object oPC)
 {
     object oPCToken = CreateItemOnObject(TOKEN_TAG, oPC);
