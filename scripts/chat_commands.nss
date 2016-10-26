@@ -19,7 +19,7 @@ void DoSocialCheck(object oUser, object oTarget, string sSkill)
     int iSkillConst = DBGetSkillConst(sSkill);
     if(iSkillConst < 0)
     {
-    	SendMessageToPC(oUser, "Social command failed - did not understand " + 
+    	SendMessageToPC(oUser, "Social command failed - did not understand " +
 		"skill " + sSkill);
 	return;
     }
@@ -64,54 +64,61 @@ void DoSocialCheck(object oUser, object oTarget, string sSkill)
 
 void RollCommand(object oUser, string sText)
 {
-     int iConst, iMod;
-     string sNormalized = GetStringLowerCase(sText); 
-     int iIdx = -1;
+    int iConst, iMod;
+    string sNormalized = GetStringLowerCase(sText);
+    int iIdx = -1;
 
-     // Ability score roll
-     iIdx = FindSubString("strength dexterity constitution intelligence wisdom charisma", sNormalized);
-     if(iIdx >= -1)
-     {
-	iConst = DBGetAbilityConst(sNormalized);
-	if(iConst < 0)
-	{
-	    SendMessagetoPC(oUser, "Roll command failed - could not find roll " + 
-		"option " + sText);
-	    return;
-	}
-	iMod = GetAbilityModifier(iConst, oUser);
-     }
+    // Ability score roll
+    iIdx = FindSubString("strength dexterity constitution intelligence wisdom charisma", sNormalized);
+    if(iIdx >= -1)
+    {
+        iConst = DBGetAbilityConst(sNormalized);
+        if(iConst < 0)
+        {
+            SendMessagetoPC(oUser, "Roll command failed - could not find roll " +
+                    "option " + sText);
+            return;
+        }
+        iMod = GetAbilityModifier(iConst, oUser);
+    }
 
-     // Save roll          0         10     17
-     iIdx = FindSubString("fortitude reflex will");
-     switch(iIdx)
-     {
-         case 0:  iMod = GetFortitudeSavingThrow(oUser); break;
-	 case 10: iMod = GetReflexSavingThrow(oUser)   ; break;
-	 case 17: iMod = GetWillSavingThrow(oUser)     ; break;
-     }
+    // Save roll          0         10     17
+    iIdx = FindSubString("fortitude reflex will");
+    switch(iIdx)
+    {
+        case 0:  iMod = GetFortitudeSavingThrow(oUser); break;
+        case 10: iMod = GetReflexSavingThrow(oUser)   ; break;
+        case 17: iMod = GetWillSavingThrow(oUser)     ; break;
+    }
 
-     // Must be a skill roll. TODO: Probably a cleaner way of doing this
-     if(iIdx < 0)
-     {
-	iConst = DBGetSkillConst(sNormalized);
-	if(iConst < 0)
-	{
-	    SendMessagetoPC(oUser, "Roll command failed - could not find roll " + 
-		"option " + sText);
-	    return;
-	}
-	iMod = GetSkillRank(iConst, oUser);
-     }
+    // Must be a skill roll. TODO: Probably a cleaner way of doing this
+    if(iIdx < 0)
+    {
+        iConst = DBGetSkillConst(sNormalized);
+        if(iConst < 0)
+        {
+            SendMessagetoPC(oUser, "Roll command failed - could not find roll " +
+                    "option " + sText);
+            return;
+        }
+        iMod = GetSkillRank(iConst, oUser);
+    }
 
-     // TODO: finish rolling stuff now that we have modifier
+    int iRoll = d20();
+    string sResult = "[" + stext + " check: 1d20(" + IntToString(iRoll) +
+        ") + modifier(" + IntToString(iMod) + ") = " +
+        IntToString(iRoll+iMod) + "]";
+
+    // TODO: allow private/public?
+    AssignCommand(oUser, SpeakString(sResult));
+    AssignCommand(oUser, SpeakString(sResult, TALKVOLUME_SILENT_SHOUT));
 }
 
 /* Expects sText to be of the format
    [social roll] (target)
-   
+
    Where [social skill] must be: bluff, intimidate, or persuade
-   and (target) can be either a PC name or all 
+   and (target) can be either a PC name or all
 
    intimidate and persuade can be used selectively on targets, but bluff
    must be used on all who can hear.
@@ -124,10 +131,11 @@ void SocialCommand(object oUser, string sText, int iChannel)
     string sTarget = "";
     object oTarget;
 
+    // TODO: see how this range looks in-game
     float fRange = 50.0;
     if(iChannel == CHAT_CHANNEL_WHISPER)
         fRange = 10.0;
-	
+
     struct sStringTokenizer sParams = GetStringTokenizer(sText, " ");
 
     while(HasMoreTokens(sParams))
@@ -155,17 +163,16 @@ void SocialCommand(object oUser, string sText, int iChannel)
 
 	    if(!GetObjectSeen(oUser, oTarget))
 	        continue;
-	    
+
 	    DoSocialCheck(oUser, oTarget, sSkill);
 	    oTarget = GetNextObjectInShape(SHAPE_SPHERE, fRange, lUserLoc);
 	}
     }
     else if(sSkill != "bluff" && sTarget != "")
     {
-    	// TODO: handle first name
 	oTarget = GetPCByName(sTarget);
 
-	if(!GetObjectSeen(oUser, oTarget) || 
+	if(!GetObjectSeen(oUser, oTarget) ||
 		GetDistanceBetween(oUser, oTarget) > fRange)
 	{
 	    SendMessageToPC(oUser, "Social command failed - not close enough " +
@@ -177,7 +184,7 @@ void SocialCommand(object oUser, string sText, int iChannel)
     }
     else
     {
-	SendMessageToPC(oUser, "Social command failed - failed to understand " + 
+	SendMessageToPC(oUser, "Social command failed - failed to understand " +
 		"command '" +sText + "'."
 	return;
     }

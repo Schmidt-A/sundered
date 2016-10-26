@@ -1,3 +1,6 @@
+#include "core_pc_token"
+
+
 object GetPCByName(string sPCName)
 {
     object oTemp = GetFirstPC();
@@ -5,8 +8,7 @@ object GetPCByName(string sPCName)
 
     while(GetIsObjectValid(oTemp))
     {
-    	// TODO: Allow to search by first name as well using PC Token
-        if(GetName(oTemp) == sPCName)
+        if(GetName(oTemp) == sPCName || PCDGetFirstName(oTemp) == sPCName)
 	{
 	    oPC = oTemp;
 	    break;
