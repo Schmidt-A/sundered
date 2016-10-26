@@ -1,3 +1,4 @@
+// TODO: need to revisit palates if food consumption becomes manual
 #include "nwnx_odbc"
 
 string FOOD_CHEST_ALL       = "fc_all";
@@ -10,6 +11,7 @@ string FOOD_CHEST_SPOILED   = "fc_spoiled";
 
 string APPLIER_TAG = "Hunger_Applier";
 
+// TODO: make this the same in DB
 int FOOD_ORGANIC = 0;
 int FOOD_SWEET   = 1;
 int FOOD_MEAT    = 2;
@@ -94,7 +96,7 @@ int FreshnessPercentage(object oFood)
 
 void DrainAllAbilities(object oPC, int iAmount, int iDurationType, object oApplier=OBJECT_INVALID)
 {
-    effect eEffect;    
+    effect eEffect;
     int iAbility;
 
     // Hit all 6 ability scores
