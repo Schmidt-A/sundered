@@ -1,5 +1,7 @@
 #include "core_pc_token"
 
+// TODO: Functions for setting/clearing death levels on a given area
+
 void Unconsciousness(object oPC)
 {
 

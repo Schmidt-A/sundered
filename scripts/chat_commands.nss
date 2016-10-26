@@ -4,6 +4,7 @@
 
 #include "core_utilities"
 #include "core_pc_token"
+#include "incl_colors"
 #include "incl_dicebag"
 
 
@@ -111,7 +112,7 @@ void RollCommand(object oUser, string sText)
         IntToString(iRoll+iMod) + "]";
 
     // TODO: allow private/public?
-    AssignCommand(oUser, SpeakString(sResult));
+    AssignCommand(oUser, SpeakString(ColorTokenBlue(sResult)));
     AssignCommand(oUser, SpeakString(sResult, TALKVOLUME_SILENT_SHOUT));
 }
 
