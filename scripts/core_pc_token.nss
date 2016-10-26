@@ -204,6 +204,11 @@ string PCDGetDeathLevelDM(object oPC)
     return GetIntValue(oPC, "sDeathLevelDM");
 }
 
+int PCDGetAreaEnterXP(object oPC)
+{
+    return GetIntValue(oPC, "iEnteredXP");
+}
+
 // ----------------- PC Data Setter Functions ---------------
 
 void PCDAddSurvivalTime(object oPC, int iSurvivalTimes=1)
@@ -239,6 +244,16 @@ void PCDSetDeathLevel(object oPC, int iDeathLevel)
 void PCDSetDeathLevelDM(object oPC, int iDeathLevel)
 {
     SetIntValue(oPC, "sDeathLevelDM", iDeathLevel);
+}
+
+void PCDSetAreaEnterXP(object oPC, int iXP)
+{
+    SetIntValue(oPC, "iEnteredXP", iXP);
+}
+
+void PCDAddInjury(object oPC)
+{
+    UpdateIntValue(oPC, "iInjuries", 1);
 }
 
 // ----------------- Profession Data Functions ----------------
