@@ -106,9 +106,16 @@ void main()
 	{
 	    EmoteCommand(oPC, GetStringRight(sText, 7));
 	}
+        else if(GetSubString(sText, 1, 10) == "deathlevel")
+        {
+            if(GetIsPlayerCharacter(oPC))
+                InvalidCommand(oPC, sText);
+            else
+                DeathLevelCommand(oPC, GetStringRight(sText, 12));
+        }
 	else
 	{
-	    invalid(oPC, sText);
+	    InvalidCommand(oPC, sText);
 	}
 
 	SetLocalString(oPC, "NWNX!CHAT!SUPRESS", "1");
@@ -116,7 +123,7 @@ void main()
 
     // Log this message
     log(sText, iMode, iTo);
-    
+
     // remove garbage
     DeleteLocalString(oPC, "NWNX!CHAT!TEXT");
     DeleteLocalString(oPC, "NWNX!CHAT!SUPRESS");

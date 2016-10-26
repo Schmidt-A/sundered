@@ -10,6 +10,10 @@
 string TOKEN_VAR = "oPCToken";
 string TOKEN_TAG = "token_pc";
 
+int DEATH_LEVEL_UNCONSCIOUSNESS = 1;
+int DEATH_LEVEL_INJURY = 2;
+int DEATH_LEVEL_PERMA = 3;
+
 // ----------------- Private Functions ----------------------
 
 int GetIntValue(object oPC, string sField)
@@ -116,6 +120,7 @@ void PCDSetupNewToken(object oPC)
     SetLocalString(oPCToken, "sName", GetFirstName(oPC));
     SetLocalFloat(oPCToken, "fSatisfaction", 100.0);
     SetLocalInt(oPCToken, "bDead", FALSE);
+    SetLocalInt(oPCToken, "iDeathLevel", DEATH_LEVEL_UNCONSCIOUSNESS);
 
     SetLocalObject(oPC, TOKEN_VAR, oPCToken);
 }
@@ -189,6 +194,16 @@ string PCDGetFaction(object oPC)
     return GetStringValue(oPC, "sFaction");
 }
 
+string PCDGetDeathLevel(object oPC)
+{
+    return GetIntValue(oPC, "sDeathLevel");
+}
+
+string PCDGetDeathLevelDM(object oPC)
+{
+    return GetIntValue(oPC, "sDeathLevelDM");
+}
+
 // ----------------- PC Data Setter Functions ---------------
 
 void PCDAddSurvivalTime(object oPC, int iSurvivalTimes=1)
@@ -214,6 +229,16 @@ void PCDSetVersion(object oPC, int iVersion)
 void PCDSetFaction(object oPC, string sFaction)
 {
     SetStringValue(oPC, "sFaction", sFaction);
+}
+
+void PCDSetDeathLevel(object oPC, int iDeathLevel)
+{
+    SetIntValue(oPC, "sDeathLevel", iDeathLevel);
+}
+
+void PCDSetDeathLevelDM(object oPC, int iDeathLevel)
+{
+    SetIntValue(oPC, "sDeathLevelDM", iDeathLevel);
 }
 
 // ----------------- Profession Data Functions ----------------

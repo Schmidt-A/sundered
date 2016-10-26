@@ -3,6 +3,7 @@
 #include "nwnx_chat"
 
 #include "core_utilities"
+#include "core_pc_token"
 #include "incl_dicebag"
 
 
@@ -158,7 +159,7 @@ void SocialCommand(object oUser, string sText, int iChannel)
 
 	while(GetIsObjectValid(oTarget))
 	{
-	    if(!GetIsPC(oTarget))
+	    if(!GetIsPlayerCharacter(oTarget))
 	        continue;
 
 	    if(!GetObjectSeen(oUser, oTarget))
@@ -190,7 +191,62 @@ void SocialCommand(object oUser, string sText, int iChannel)
     }
 }
 
+void DeathLevelCommand(object oUser, string sText)
+{
+    int iIdx = FindSubString("0 1 2 3");
+
+    if(iIdx < 0)
+    {
+        SendMessageToPC(oUser, "Death Level command failed - level must be 1, 2 or 3");
+        return;
+    }
+
+    int iLevel   = StringToInt(sText);
+    object oArea = GetArea(oUser);
+    object oObj  = GetFirstObjectInArea(oArea);
+
+    string sPCList;
+    string sLevel;
+    switch(iLevel)
+    {
+        case 0: sLevel = "Cleared";                  break;
+        case 1: sLevel = "Standard Unconsciousness"; break;
+        case 2: sLevel = "Permanent Injury";         break;
+        case 3: sLevel = "Permanent Death";          break;
+    }
+
+    while(oObj != OBJECT_INVALID)
+    {
+        if(!GetIsPlayerCharacter(oObj))
+            continue;
+
+        // Set Death level on player appropriately - overrides area settings
+        PCDSetDeathLevelDM(oObj, iLevel);
+        string sPCList += GetName(oObj) + ", ";
+
+        oObj = GetNextObjectInArea(oArea);
+    }
+
+    sPCList = GetStringLeft(sPCList, GetLength(sPCList)-2);
+
+    SendMessageToPC(oUser, "DM Death level for PCs in area set to " + sText + ": " +
+        sLevel);
+    if(iLevel > 0)
+    {
+        SendMessageToPC(oUser, "WARNING: You MUST set the death level to 0 " +
+            "for all affected PCs once your event is complete. Affected PCs: " +
+            sPCList);
+    }
+    else
+        SendMessageToPC(oUser, "DM Death level cleared.");
+}
+
 void HelpCommand(object oUser, string sText)
+{
+
+}
+
+void InvalidCommand(object oUser, string sText)
 {
 
 }
