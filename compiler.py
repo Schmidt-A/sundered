@@ -59,13 +59,15 @@ def clean():
     cmd = 'rm ' + SCRIPT_DIR + '*ncs'
     print subprocess.Popen(cmd, shell=True,
             stdout=subprocess.PIPE).stdout.read()
-    print '...done\n------------------------------------------'
+    print '...done'
 
 
 def error_summary():
-    print 'COMPILE ERRORS:'
-    for err in error_list:
-        print err
+    if len(error_list) > 0:
+        print '-------------------------------------------'
+        print 'COMPILE ERRORS:'
+        for err in error_list:
+            print err
 
 
 def main(args):
