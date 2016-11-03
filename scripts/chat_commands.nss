@@ -1,4 +1,5 @@
 #include "x0_i0_stringlib"
+#include "nw_i0_plot"
 
 #include "nwnx_chat"
 
@@ -10,13 +11,6 @@
 
 void DoSocialCheck(object oUser, object oTarget, string sSkill)
 {
-    if(oTarget == OBJECT_INVALID)
-    {
-	// TODO: Better string system?
-	SendMessageToPC(oUser, "Social command failed - could not find a PC " +
-		"named " + sTarget + ".");
-	return;
-    }
 
     int iSkillConst = DBGetSkillConst(sSkill);
     if(iSkillConst < 0)
@@ -27,7 +21,7 @@ void DoSocialCheck(object oUser, object oTarget, string sSkill)
     }
 
     int iCheck = d10() + GetSkillRank(iSkillConst, oUser);
-    int iOpposed = GetOpposedSocialSkillCheck(oTarget, sSkill);
+    int iOpposed = GetOpposedSocialSkillCheck(oTarget);
     int iDifference = iCheck - iOpposed; // positive = user won
 
     if(iDifference <= -10) // dramatic failure
@@ -41,7 +35,7 @@ void DoSocialCheck(object oUser, object oTarget, string sSkill)
     {
         // Partial failure
     }
-    else if(iDifference >= -4 && iDifference =< 4)
+    else if(iDifference >= -4 && iDifference <= 4)
     {
     	// No effect
     }
@@ -77,7 +71,7 @@ void RollCommand(object oUser, string sText)
         iConst = DBGetAbilityConst(sNormalized);
         if(iConst < 0)
         {
-            SendMessagetoPC(oUser, "Roll command failed - could not find roll " +
+            SendMessageToPC(oUser, "Roll command failed - could not find roll " +
                     "option " + sText);
             return;
         }
@@ -85,7 +79,7 @@ void RollCommand(object oUser, string sText)
     }
 
     // Save roll          0         10     17
-    iIdx = FindSubString("fortitude reflex will");
+    iIdx = FindSubString("fortitude reflex will", sNormalized);
     switch(iIdx)
     {
         case 0:  iMod = GetFortitudeSavingThrow(oUser); break;
@@ -99,7 +93,7 @@ void RollCommand(object oUser, string sText)
         iConst = DBGetSkillConst(sNormalized);
         if(iConst < 0)
         {
-            SendMessagetoPC(oUser, "Roll command failed - could not find roll " +
+            SendMessageToPC(oUser, "Roll command failed - could not find roll " +
                     "option " + sText);
             return;
         }
@@ -107,12 +101,12 @@ void RollCommand(object oUser, string sText)
     }
 
     int iRoll = d20();
-    string sResult = "[" + stext + " check: 1d20(" + IntToString(iRoll) +
+    string sResult = "[" + sText + " check: 1d20(" + IntToString(iRoll) +
         ") + modifier(" + IntToString(iMod) + ") = " +
         IntToString(iRoll+iMod) + "]";
 
     // TODO: allow private/public?
-    AssignCommand(oUser, SpeakString(ColorTokenBlue(sResult)));
+    AssignCommand(oUser, SpeakString(ColorTokenBlue() + sResult, TALKVOLUME_TALK));
     AssignCommand(oUser, SpeakString(sResult, TALKVOLUME_SILENT_SHOUT));
 }
 
@@ -142,7 +136,7 @@ void SocialCommand(object oUser, string sText, int iChannel)
 
     while(HasMoreTokens(sParams))
     {
-	if(sSkill == "");
+	if(sSkill == "")
 	    sSkill = GetStringLowerCase(GetNextToken(sParams));
 	else
 	{
@@ -181,24 +175,31 @@ void SocialCommand(object oUser, string sText, int iChannel)
 	    	"to " + sTarget + ".");
 	    return;
 	}
+        if(oTarget == OBJECT_INVALID)
+        {
+            // TODO: Better string system?
+            SendMessageToPC(oUser, "Social command failed - could not find a PC " +
+                    "named " + sTarget + ".");
+            return;
+        }
 
 	DoSocialCheck(oUser, oTarget, sSkill);
     }
     else
     {
 	SendMessageToPC(oUser, "Social command failed - failed to understand " +
-		"command '" +sText + "'."
+		"command '" +sText + "'.");
 	return;
     }
 }
 
 void DeathLevelCommand(object oUser, string sText)
 {
-    int iIdx = FindSubString("0 1 2 3");
+    int iIdx = FindSubString("0 1 2 3", sText);
 
     if(iIdx < 0)
     {
-        SendMessageToPC(oUser, "Death Level command failed - level must be 1, 2 or 3");
+        SendMessageToPC(oUser, "Death Level command failed - level must be 0, 1, 2 or 3");
         return;
     }
 
@@ -223,12 +224,12 @@ void DeathLevelCommand(object oUser, string sText)
 
         // Set Death level on player appropriately - overrides area settings
         PCDSetDeathLevelDM(oObj, iLevel);
-        string sPCList += GetName(oObj) + ", ";
+        sPCList = sPCList + GetName(oObj) + ", ";
 
         oObj = GetNextObjectInArea(oArea);
     }
 
-    sPCList = GetStringLeft(sPCList, GetLength(sPCList)-2);
+    sPCList = GetStringLeft(sPCList, GetStringLength(sPCList)-2);
 
     SendMessageToPC(oUser, "DM Death level for PCs in area set to " + sText + ": " +
         sLevel);

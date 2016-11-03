@@ -1,4 +1,4 @@
-        //::///////////////////////////////////////////////
+//::///////////////////////////////////////////////
 //:: nwnx_chat   formerly dmb_chat
 //:: FileName
 //:: Copyright (c) 2005 dumbo (dumbo@nm.ru)
@@ -18,7 +18,7 @@ const int CHAT_CHANNEL_DM          = 14;
 
 //Send chat message
 //nChannel - CHAT_CHANNEL_*
-void dmb_SendMessage(object oSender, int nChannel, string sMessage, object oRecipient=OBJECT_INVALID);
+int dmb_SendMessage(object oSender, int nChannel, string sMessage, object oRecipient=OBJECT_INVALID);
 
 void dmb_ChatInit()
 {

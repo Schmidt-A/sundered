@@ -41,8 +41,8 @@ void SetupNextECLLevel(object oPC)
     int iECL = iBaseLevel + GetCampaignInt("RACE", sPre+"iLA");
 
     SetCampaignInt("RACE", sPre+"iECL", iECL);
-    SetCampaignInt("RACE", sPre+"iRealXP", GetSubraceXP(iBaseLevel));
-    SetCampaignInt("RACE", sPre+"iXPNeeded", GetSubraceXP(iECL));
+    SetCampaignInt("RACE", sPre+"iRealXP", GetECLXP(iBaseLevel));
+    SetCampaignInt("RACE", sPre+"iXPNeeded", GetECLXP(iECL));
 }
 
 int GetLA(string sRace)

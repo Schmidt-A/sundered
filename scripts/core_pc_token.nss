@@ -4,15 +4,15 @@
 
 #include "x3_inc_string"
 #include "x0_i0_stringlib"
-#include "colors_inc"
+#include "incl_colors"
 #include "nwnx_funcs"
 
 string TOKEN_VAR = "oPCToken";
 string TOKEN_TAG = "token_pc";
 
-int DEATH_LEVEL_UNCONSCIOUSNESS = 1;
-int DEATH_LEVEL_INJURY = 2;
-int DEATH_LEVEL_PERMA = 3;
+const int DEATH_LEVEL_UNCONSCIOUSNESS = 1;
+const int DEATH_LEVEL_INJURY = 2;
+const int DEATH_LEVEL_PERMA = 3;
 
 // ----------------- Private Functions ----------------------
 
@@ -194,12 +194,12 @@ string PCDGetFaction(object oPC)
     return GetStringValue(oPC, "sFaction");
 }
 
-string PCDGetDeathLevel(object oPC)
+int PCDGetDeathLevel(object oPC)
 {
     return GetIntValue(oPC, "sDeathLevel");
 }
 
-string PCDGetDeathLevelDM(object oPC)
+int PCDGetDeathLevelDM(object oPC)
 {
     return GetIntValue(oPC, "sDeathLevelDM");
 }
@@ -261,7 +261,7 @@ void PCDAddInjury(object oPC)
 // TODO: This will get replaced with whatever system we decide on
 string PCDGetProfession(object oPC)
 {
-    GetStringValue(oPC, "sProfession");
+    return GetStringValue(oPC, "sProfession");
 }
 
 void PCDSetProfession(object oPC, string sProfession)
@@ -271,7 +271,7 @@ void PCDSetProfession(object oPC, string sProfession)
 
 int PCDGetProfessionLevel(object oPC)
 {
-    GetIntValue(oPC, "iProfessionLevel");
+    return GetIntValue(oPC, "iProfessionLevel");
 }
 
 void PCDSetProfessionLevel(object oPC, int iProfessionLevel)

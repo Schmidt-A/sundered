@@ -12,25 +12,25 @@ string FOOD_CHEST_SPOILED   = "fc_spoiled";
 string APPLIER_TAG = "Hunger_Applier";
 
 // TODO: make this the same in DB
-int FOOD_ORGANIC = 0;
-int FOOD_SWEET   = 1;
-int FOOD_MEAT    = 2;
-int FOOD_GENERAL = 3;
-int FOOD_RAW     = 4;
+const int FOOD_ORGANIC = 0;
+const int FOOD_SWEET   = 1;
+const int FOOD_MEAT    = 2;
+const int FOOD_GENERAL = 3;
+const int FOOD_RAW     = 4;
 
-float RAVENOUS      = 30.0;
-float DEATHS_DOOR   = 10.0;
+const float RAVENOUS      = 30.0;
+const float DEATHS_DOOR   = 10.0;
 
-float DISLIKE_MODIFIER  = 0.75;
-float LIKE_MODIFIER     = 1.5;
+const float DISLIKE_MODIFIER  = 0.75;
+const float LIKE_MODIFIER     = 1.5;
 
-int EFFECT_SURVIVALIST      = 0;
-int EFFECT_PICKY_LIKE       = 1;
-int EFFECT_PICKY_DISLIKE    = 2;
-int EFFECT_LIKE             = 3;
-int EFFECT_DISLIKE          = 4;
+const int EFFECT_SURVIVALIST      = 0;
+const int EFFECT_PICKY_LIKE       = 1;
+const int EFFECT_PICKY_DISLIKE    = 2;
+const int EFFECT_LIKE             = 3;
+const int EFFECT_DISLIKE          = 4;
 
-float EFFECT_DUR            = 120.0;
+const float EFFECT_DUR            = 120.0;
 
 /*-------------- Helper Functions ---------------*/
 object  ChestLoop(object oChest, object oPC);
@@ -123,7 +123,7 @@ void ApplyPalateEffect(object oPC, int iContext, int iPalate=4)
             eEffect = EffectSavingThrowDecrease(SAVING_THROW_FORT, 1);
             break;
         case EFFECT_PICKY_LIKE:
-            eEffect = EffectTemporaryHitPoints(5);
+            eEffect = EffectTemporaryHitpoints(5);
             break;
         case EFFECT_PICKY_DISLIKE:
             eEffect = EffectSavingThrowDecrease(SAVING_THROW_ALL, 1);
@@ -527,7 +527,7 @@ void HandleStarvation(object oPC, object oPCToken, string sLevel)
                 eEffect = SupernaturalEffect(EffectSkillDecrease(SKILL_DISCIPLINE, 4));
                 AssignCommand(oApplier, ApplyEffectToObject(DURATION_TYPE_PERMANENT, eEffect, oPC));
 
-                eEffect = SupernaturalEffecti(EffectSkillDecrease(SKILL_TUMBLE, 4));
+                eEffect = SupernaturalEffect(EffectSkillDecrease(SKILL_TUMBLE, 4));
                 AssignCommand(oApplier, ApplyEffectToObject(DURATION_TYPE_PERMANENT, eEffect, oPC));
 
                 SetLocalInt(oPCToken, "bCanRecoverHunger", FALSE);

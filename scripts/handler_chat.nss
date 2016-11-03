@@ -10,8 +10,9 @@
 
 // Format : CHAT_[LEVL]:[SOURCE] | [DESTINATION] | [MESSAGE]
 
-void log(string sText, int iMode, int iTo)
+void LogChat(string sText, int iMode, int iTo)
 {
+    object oPCn;
     // Portion of format : CHAT_[LEVL]:[SOURCE] |
     string sMsg = "CHAT_" + dmb_getChannelText(iMode) + ": (";
     sMsg += GetPCPlayerName(OBJECT_SELF) + ") " + GetName(OBJECT_SELF) + " | ";
@@ -29,9 +30,9 @@ void log(string sText, int iMode, int iTo)
                                                     CREATURE_TYPE_PLAYER_CHAR,
                                                     PLAYER_CHAR_IS_PC,
                                                     OBJECT_SELF,
-                                                    nIdx++)))
+                                                    iIdx++)))
         {
-            if (GetDistanceToObject(oPCn) < fDst && oPCn != oPC)
+            if (GetDistanceToObject(oPCn) < fDst && oPCn != OBJECT_SELF)
                 sMsg += GetName(oPCn)+":";
             else
                 break;
@@ -65,8 +66,8 @@ void log(string sText, int iMode, int iTo)
     }
     // Portion of format : | [MESSAGE]
     sMsg += " | ";
-    SetLocalString(oPC, "NWNX!CHAT!LOG", sMsg+"\n");
-    SetLocalString(oPC, "NWNX!CHAT!LOG", " *** "+sText+"\n");
+    SetLocalString(OBJECT_SELF, "NWNX!CHAT!LOG", sMsg+"\n");
+    SetLocalString(OBJECT_SELF, "NWNX!CHAT!LOG", " *** "+sText+"\n");
 
     // The internet never forgets
     WriteTimestampedLogEntry(sMsg + sText);
@@ -122,7 +123,7 @@ void main()
     }
 
     // Log this message
-    log(sText, iMode, iTo);
+    LogChat(sText, iMode, iTo);
 
     // remove garbage
     DeleteLocalString(oPC, "NWNX!CHAT!TEXT");

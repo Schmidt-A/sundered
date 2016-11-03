@@ -17,7 +17,8 @@ void main() {
             SendMessageToPC(oTarget, "XP is being removed from your character " +
                 "sheet so it can be tracked on your ECL token instead.");
             SetXP(oTarget, GetXP(oTarget)-iXP);
-            GiveXPToCreatureDH(oTarget, iXP);
+            // TODO: Needs to be an ECL xp function if we're doing LAs
+            //GiveXPToCreatureDH(oTarget, iXP);
         }
 
         // Format : XP_DM:[dm name] | [player account] | [character] | [xp amount] | [xp cumulative]

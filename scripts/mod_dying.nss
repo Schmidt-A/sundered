@@ -1,3 +1,5 @@
+#include "nw_i0_plot"
+
 #include "core_pc_token"
 
 
@@ -24,7 +26,7 @@ void Bleed(int iBleedAmt)
 {
     effect eBleedEffect = EffectDamage(iBleedAmt);
 
-    if(GetCurrentHitPoints <= 0)
+    if(GetCurrentHitPoints(OBJECT_SELF) <= 0)
     {
         if(iBleedAmt < 0) // Negative bleeding = healing
             eBleedEffect = EffectHeal(-iBleedAmt);
@@ -77,7 +79,7 @@ void Bleed(int iBleedAmt)
 
         // Keep bleeding out if we need to
         if(GetCurrentHitPoints() <= 0)
-            DelayCommand(6.0 Bleed(iBleedAmt));
+            DelayCommand(6.0, Bleed(iBleedAmt));
     }
 }
 
@@ -89,5 +91,5 @@ void main()
         return;
 
     // TODO: Rules for PvP death
-    AssignCommand(oDying, Bleed(1))
+    AssignCommand(oPC, Bleed(1));
 }

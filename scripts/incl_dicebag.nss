@@ -33,7 +33,7 @@ int DBGetSkillConst(string sSkillName)
     	"WHERE string_ref = " + sSkillName + ";");
 
     if(SQLFetch() == SQL_SUCCESS)
-	return SQLGetData(1);
+	return StringToInt(SQLGetData(1));
 
     return -1;
 }
@@ -44,7 +44,7 @@ int DBGetAbilityConst(string sAbilityName)
     	"WHERE string_ref = " + sAbilityName + ";");
 
     if(SQLFetch() == SQL_SUCCESS)
-	return SQLGetData(1);
+	return StringToInt(SQLGetData(1));
 
     return -1;
 }
