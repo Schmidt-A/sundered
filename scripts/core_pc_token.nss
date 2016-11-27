@@ -213,7 +213,7 @@ int PCDGetAreaEnterXP(object oPC)
 
 void PCDAddSurvivalTime(object oPC, int iSurvivalTimes=1)
 {
-    UpdateIntValue(oPC, "iSurvivalTimes", iSurvivalTimes);
+    UpdateIntValue(oPC, "iSurvivalTime", iSurvivalTimes);
 }
 
 void PCDSetDead(object oPC)
@@ -229,11 +229,6 @@ void PCDSetAlive(object oPC)
 void PCDSetVersion(object oPC, int iVersion)
 {
     SetIntValue(oPC, "iVersion", iVersion);
-}
-
-void PCDSetFaction(object oPC, string sFaction)
-{
-    SetStringValue(oPC, "sFaction", sFaction);
 }
 
 void PCDSetDeathLevel(object oPC, int iDeathLevel)
@@ -256,9 +251,17 @@ void PCDAddInjury(object oPC)
     UpdateIntValue(oPC, "iInjuries", 1);
 }
 
+
+
 // ----------------- Profession Data Functions ----------------
 
 // TODO: This will get replaced with whatever system we decide on
+
+void PCDSetFaction(object oPC, string sFaction)
+{
+    SetStringValue(oPC, "sFaction", sFaction);
+}
+
 string PCDGetProfession(object oPC)
 {
     return GetStringValue(oPC, "sProfession");

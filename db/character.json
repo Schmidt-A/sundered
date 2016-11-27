@@ -1,0 +1,33 @@
+{
+	"character": {
+		"charName": "Miriam",
+		"playerName": "Aez",
+		"attributes": {
+			"race": "Human",
+			"warped": "None",
+			"classChoice": "Wizard"
+		},
+		"stats": {
+			"version": 11,
+			"hasBio": true,
+			"exp": 3500,
+			"survivalTime": 13745.5,
+			"injuries": 2,
+			"hunger": 87.3
+		},
+		"logoff": {
+			"time": "1000-01-01 00:00:00",
+			"health": 12, 
+			"area": "Hearth",
+			"location": {
+				"x": 43.2,
+				"y": 86.8
+			},
+			"spellsUsed": {
+				"level1": 2,
+				"level2": 0
+			},
+			"unsavedExp": 86
+		}
+	}
+}

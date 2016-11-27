@@ -13,6 +13,7 @@ void main()
         int iDMDeathLevel = PCDGetDeathLevelDM(oPC);
         if(iDMDeathLevel > 0)
         {
+            //Maybe we should just clear this here instead
             string sWarning = "PLAYER " + GetPCPlayerName(oPC) + "'S CHARACTER " +
                 GetName(oPC) + "LOGGED OFF WITH CUSTOM DEATH LEVEL " +
                 IntToString(iDMDeathLevel) + ". THIS MUST BE CLEARED.";

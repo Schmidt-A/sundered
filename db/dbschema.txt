@@ -1,0 +1,165 @@
+CREATE TABLE `char_list` (
+  `id` int(11) NOT NULL DEFAULT '0' UNIQUE,
+  `player_id` int(11) NOT NULL DEFAULT '0',
+  `char_name` varchar(64) NOT NULL DEFAULT ' ',
+  `subrace_id` int(11) NOT NULL DEFAULT '0',
+  `palate_id` int(11) DEFAULT '0',
+  `class_choice` varchar(64) DEFAULT ' ',
+  `origin` varchar(64) DEFAULT ' ',
+  `faction` varchar(64) DEFAULT ' ',
+  `profession` varchar(64) DEFAULT 'laborer',
+  `prof_lvl` int(11) DEFAULT '0',
+  `exp` int(11) DEFAULT '0',
+  `hunger` float DEFAULT '100.0',
+  `version` int(11) DEFAULT '0',
+  `has_bio` varchar(64) DEFAULT ' ',
+  `survive_time` float DEFAULT '0.0'
+  `health` int(11) DEFAULT '0',
+  `dead` varchar(64) DEFAULT 'alive',
+  `injury_cnt` int(11) DEFAULT '0',
+  `disease_cnt` int(11) DEFAULT '0',
+  `area` varchar(64) DEFAULT ' ',
+  `location` varchar(64) DEFAULT ' ',
+  PRIMARY KEY (`id`),
+  FOREIGN KEY (`player_id`) REFERENCES player_list(`id`),
+  FOREIGN KEY (`palate_id`) REFERENCES palate_table(`id`)
+  FOREIGN KEY (`subrace_id`) REFERENCES subrace_table(`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+CREATE TABLE `player_list` (
+  `id` int(11) NOT NULL DEFAULT '0' UNIQUE,
+  `player_name` varchar(64) NOT NULL DEFAULT ' ',
+  `cdkey` varchar(64) DEFAULT ' ',
+  `banned` datetime DEFAULT '1000-01-01 00:00:00',
+  `staff` varchar(64) DEFAULT 'player',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  
+
+
+CREATE TABLE `hunger_const` (
+  `id` int(11) NOT NULL DEFAULT '0' UNIQUE,
+  `level` varchar(64) NOT NULL DEFAULT 'Stuffed',
+  `max` int(11) NOT NULL DEFAULT '100',
+  `min` int(11) NOT NULL DEFAULT '91',
+  `loss_rate` float NOT NULL DEFAULT '3.33',
+  `penalties` varchar(64) DEFAULT '0',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+  
+
+CREATE TABLE `food_table` (
+  `id` int(11) NOT NULL DEFAULT '0' UNIQUE,
+  `name` varchar(64) NOT NULL DEFAULT ' ',
+  `tag` varchar(64) NOT NULL DEFAULT ' ',
+  `resref` varchar(64) NOT NULL DEFAULT ' ',
+  `type` varchar(64) NOT NULL DEFAULT 'RAW',
+  `satisfaction` int(11) DEFAULT '0',
+  `max_freshness` int(11) DEFAULT '5',
+  `description` varchar (255) DEFAULT ' ',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+  
+  
+CREATE TABLE `palate_table` (
+  `id` int(11) NOT NULL DEFAULT '0' UNIQUE,
+  `name` varchar(64) NOT NULL DEFAULT 'Generalist',
+  `good_food` varchar(255) DEFAULT ' ',
+  `bonus` varchar(255) DEFAULT ' ',
+  `bad_food` varchar(255) DEFAULT ' ',
+  `penalty` varchar(255) DEFAULT ' ',
+  `priority` varchar(64) DEFAULT ' ',
+  `satis_inc` int(11) DEFAULT '0',
+  `satis_dec` int(11) DEFAULT '0',
+  `duration` float DEFAULT '0',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+CREATE_TABLE `subrace_table` (
+  `id` int(11) NOT NULL DEFAULT '0' UNIQUE,
+  `name` varchar(64) NOT NULL DEFAULT ' ',
+  `base_race` int(11) NOT NULL DEFAULT '30',
+  `lvl_adj` int(11) NOT NULL DEFAULT '0',
+  `stats_id` int(11) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`),
+  FOREIGN KEY (`stats_id`) REFERENCES stats_table(`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE_TABLE `eff_char_level_table` (
+  `id` int(11) NOT NULL DEFAULT '0' UNIQUE,
+  `exp_req` int(11) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+CREATE_TABLE `stats_table` (
+  `id` int(11) NOT NULL DEFAULT '0' UNIQUE,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+CREATE_TABLE `badge_table` (
+  `id` int(11) NOT NULL DEFAULT '0' UNIQUE,
+  `name` varchar(64) NOT NULL DEFAULT ' ',
+  `tag` varchar(64) NOT NULL DEFAULT ' ',
+  `entry` int(11) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+
+CREATE_TABLE `char_badge_many`
+  `id` int(11) NOT NULL DEFAULT '0' UNIQUE,
+  `char_id` int(11) NOT NULL DEFAULT '0',
+  `badge_id` int(11) NOT NULL DEFAULT '0',
+  `has_xp` int(2) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`),
+  FOREIGN KEY (`char_id`) REFERENCES char_list(`id`),
+  FOREIGN KEY (`badge_id`) REFERENCES badge_table(`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;  
+
+
+CREATE_TABLE `encounter_table`
+  `id` int(11) NOT NULL DEFAULT '0' UNIQUE,
+  `tag` varchar(64),
+  `area` varchar(64),
+  `waypoint` varchar(64),
+  `trigger_tag` varchar(64),
+  `trigger_condition` varchar(64),
+  `next_encounter` int(11),
+  `complete_condition` varchar(64),
+  `complete_tag` varchar(64),
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;  
+
+
+CREATE_TABLE `enc_creatures`
+  `id` int(11) NOT NULL DEFAULT '0' UNIQUE,
+  `encounter_id` NOT NULL DEFAULT '0',
+  `creature_tag` varchar(64) NOT NULL DEFAULT ' ',
+  `creature_num` int(11) NOT NULL DEFAULT '1',
+  PRIMARY KEY (`id`),
+  FOREIGN KEY (`encounter_id`) REFERENCES encounter_table(`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;  
+
+
+CREATE_TABLE `drop_table`
+  `id` int(11) NOT NULL DEFAULT '0' UNIQUE,
+  `trigger_tag` varchar(64),
+  `area` varchar(64),
+  `dc` int(11) NOT NULL DEFAULT '14',
+  `increment` int(11) NOT NULL DEFAULT '1',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;  
+
+
+CREATE_TABLE `drop_items`
+  `id` int(11) NOT NULL DEFAULT '0' UNIQUE,
+  `drop_id` NOT NULL DEFAULT '0',
+  `item_tag` varchar(64) NOT NULL DEFAULT ' ',
+  `stack_size` int(11),
+  PRIMARY KEY (`id`),
+  FOREIGN KEY (`drop_id`) REFERENCES drop_table(`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;  
+
