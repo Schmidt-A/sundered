@@ -1,13 +1,16 @@
 #include "nw_i0_plot"
 
-#include "core_pc_token"
 #include "nwnx_chat"
+
+#include "core_pc_token"
+#include "core_injury"
 
 void main()
 {
     object oPC = GetEnteringObject();
     dmb_PCin(oPC); // initialize nwnx chat
 
+    //
     if(GetIsPlayerCharacter(oPC))
     {
         int iDMDeathLevel = PCDGetDeathLevelDM(oPC);
@@ -19,5 +22,8 @@ void main()
             SendMessageToAllDMs(sWarning);
             WriteTimestampedLogEntry(sWarning);
         }
+
+        //Apply reduction in Injury HP to a full health character
+        ApplyInjuryHP();
     }
 }

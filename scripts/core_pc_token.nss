@@ -209,6 +209,11 @@ int PCDGetAreaEnterXP(object oPC)
     return GetIntValue(oPC, "iEnteredXP");
 }
 
+int PCDGetInjuries(object oPC)
+{
+    return GetIntValue(oPC, "iInjuries");
+}
+
 // ----------------- PC Data Setter Functions ---------------
 
 void PCDAddSurvivalTime(object oPC, int iSurvivalTimes=1)
