@@ -8,51 +8,105 @@
 #include "incl_colors"
 #include "incl_dicebag"
 
+// --------------- Helper Methods ----------------
 
-void DoSocialCheck(object oUser, object oTarget, string sSkill)
+/* Handles the message displayed to the user based on the dice roll difference
+
+*/
+string SendSocialMessage(object oUser, object oTarget, int iDifference string sSkill)
 {
 
-    int iSkillConst = DBGetSkillConst(sSkill);
-    if(iSkillConst < 0)
-    {
-    	SendMessageToPC(oUser, "Social command failed - did not understand " +
-		"skill " + sSkill);
-	return;
-    }
+    //  TODO: Messages to the user??
+    string sUserMessage = "";
+    string sTargetMessage = "";
 
-    int iCheck = d10() + GetSkillRank(iSkillConst, oUser);
-    int iOpposed = GetOpposedSocialSkillCheck(oTarget);
-    int iDifference = iCheck - iOpposed; // positive = user won
+    //  TODO: DB-Driven Messages?
+    //  TODO: different messages for different skills
 
-    if(iDifference <= -10) // dramatic failure
+    //  Numbers should be 10, 4, -4, -10 as it's more statistically even
+    
+    //Intimidate has a separate set of messages
+    if(sSkill == "itimidate")
     {
-	// TODO: (probably DB-driven) messages
-	// TODO: different messages for different skills
-	// Notify both parties about success/failure
-	// Huge failure
+        if(iDifference <= -10) 
+        {
+            // Huge failure
+            sTargetMessage = GetName(oTarget) + " is all bark, no bite.";
+        }
+        else if(iDifference >= -9 && iDifference <= -5)
+        {
+            // failure
+            sTargetMessage = GetName(oTarget) + " seems like they might not be able to back up that claim.";
+        }
+        else if(iDifference >= -4 && iDifference <= 4)
+        {
+            // No effect
+            sTargetMessage = GetName(oTarget) + " has gotten your attention. But you're not convinced yet.";
+        }
+        else if(iDifference >= 5 && iDifference <= 9)
+        {
+            // success
+            sTargetMessage = GetName(oTarget) + "'s point is very pointly made. Pointily.";
+        }
+        else
+        {
+            // Great success
+            sTargetMessage = "Agreeing with " + GetName(oTarget) + " seems like a great way to continue your time on Faerun.";
+        }
     }
-    else if(iDifference >= -9 && iDifference <= -5)
-    {
-        // Partial failure
-    }
-    else if(iDifference >= -4 && iDifference <= 4)
-    {
-    	// No effect
-    }
-    else if(iDifference >= 5 && iDifference <= 9)
-    {
-	// Slight success
-    }
+    // Persuade and Bluff have the same messages except for failures
+    // A good lie doesn't even sound like one
     else
     {
-	// Great success
+        if(iDifference <= -10) 
+        {
+            // Huge failure
+            if (sSkill == "bluff")
+            {
+                sTargetMessage = GetName(oTarget) + " is lying. You're sure of it.";
+            }
+            else
+            {
+                sTargetMessage = GetName(oTarget) + " can't expect that you'll agree to that.";
+            }
+        }
+        else if(iDifference >= -9 && iDifference <= -5)
+        {
+            // failure
+            if (sSkill == "bluff")
+            {
+                sTargetMessage = GetName(oTarget) + " is acting rather suspiciously.";
+            }
+            else
+            {
+                sTargetMessage = GetName(oTarget) + " isn't doing much to convince you.";
+            }
+        }
+        else if(iDifference >= -4 && iDifference <= 4)
+        {
+            // No effect
+            sTargetMessage = GetName(oTarget) + " makes some sense. But you're not quite sure.";
+        }
+        else if(iDifference >= 5 && iDifference <= 9)
+        {
+            // success
+            sTargetMessage = GetName(oTarget) + " has quite a compelling point.";
+        }
+        else
+        {
+            // Great success
+            sTargetMessage = GetName(oTarget) + " has you convinced. You're sold.";
+        }
     }
 
-    // Log to DMs
+    // Actually send the message
+    SendMessageToPC(oTarget, sTargetMessage);
+    
+    // Log to DMs. Actually sent after the returned function since this just compiles the target list
     string sResult = (iDifference >= 0) ? "succeeded" : "failed";
-    string sLog = GetName(oUser) + " " + sResult + " in a " + sSkill + " check " +
-    	"against " + GetName(oTarget) + " by " + IntToString(abs(iDifference)) + ".";
-    AssignCommand(oUser, SpeakString(sLog, TALKVOLUME_SILENT_SHOUT));
+    string sLog = " | " + sResult + " against " + + GetName(oTarget) + " by " + IntToString(abs(iDifference));
+    
+    return sLog;
 }
 
 
@@ -136,45 +190,65 @@ void SocialCommand(object oUser, string sText, int iChannel)
 
     while(HasMoreTokens(sParams))
     {
-	if(sSkill == "")
-	    sSkill = GetStringLowerCase(GetNextToken(sParams));
-	else
-	{
-	    sTarget = GetStringLowerCase(GetNextToken(sParams));
-	    break;
-	}
-	sParams = AdvanceToNextToken(sParams);
+    	if(sSkill == "")
+    	    sSkill = GetStringLowerCase(GetNextToken(sParams));
+    	else
+    	{
+    	    sTarget = GetStringLowerCase(GetNextToken(sParams));
+    	    break;
+    	}
+    	sParams = AdvanceToNextToken(sParams);
     }
+
+    int iIdx = FindSubString("bluff persuade intimidate", sSkill);
+
+    if(iIdx < 0)
+    {
+        SendMessageToPC(oUser, "Social command failed - skill must be bluff, persuade, or intimidate");
+        return;
+    }
+
+    //Form the DM logging base message
+    string sMessageForDM = GetName(oUser) + "attempted a " + sSkill + " check";
+
+    // Why are we relying on a DB value for this rather than  property file? 
+    // I don't think we'll ever change this without recompiling the code :PP -Aez
+    int iSkillConst = DBGetSkillConst(sSkill);
+    int iCheck = d10() + GetSkillRank(iSkillConst, oUser);
 
     if(sSkill == "bluff" || sTarget == "")
     {
 
     	location lUserLoc = GetLocation(oUser);
-	oTarget = GetFirstObjectInShape(SHAPE_SPHERE, fRange, lUserLoc);
+        oTarget = GetFirstObjectInShape(SHAPE_SPHERE, fRange, lUserLoc);
 
-	while(GetIsObjectValid(oTarget))
-	{
-	    if(!GetIsPlayerCharacter(oTarget))
-	        continue;
+    	while(GetIsObjectValid(oTarget))
+    	{
+    	    if(!GetIsPlayerCharacter(oTarget))
+    	        continue;
 
-	    if(!GetObjectSeen(oUser, oTarget))
-	        continue;
+    	    if(!GetObjectSeen(oUser, oTarget))
+    	        continue;
 
-	    DoSocialCheck(oUser, oTarget, sSkill);
-	    oTarget = GetNextObjectInShape(SHAPE_SPHERE, fRange, lUserLoc);
-	}
+            int iOpposed = GetOpposedSocialSkillCheck(oTarget);
+            int iDifference = iCheck - iOpposed; // positive = user won
+            sMessageForDM += SendSocialMessage(oUser, oTarget, sSkill);
+        
+            AssignCommand(oUser, SpeakString(sMessageForDM, TALKVOLUME_SILENT_SHOUT));
+            
+    	    oTarget = GetNextObjectInShape(SHAPE_SPHERE, fRange, lUserLoc);
+    	}
     }
-    else if(sSkill != "bluff" && sTarget != "")
+    else if(sTarget != "")
     {
-	oTarget = GetPCByName(sTarget);
+    	oTarget = GetPCByName(sTarget);
 
-	if(!GetObjectSeen(oUser, oTarget) ||
-		GetDistanceBetween(oUser, oTarget) > fRange)
-	{
-	    SendMessageToPC(oUser, "Social command failed - not close enough " +
-	    	"to " + sTarget + ".");
-	    return;
-	}
+    	if(!GetObjectSeen(oUser, oTarget) ||
+    		GetDistanceBetween(oUser, oTarget) > fRange)
+    	{
+    	    SendMessageToPC(oUser, "Social command failed - " + sTarget + " is not nearby.");
+    	    return;
+    	}
         if(oTarget == OBJECT_INVALID)
         {
             // TODO: Better string system?
@@ -183,7 +257,12 @@ void SocialCommand(object oUser, string sText, int iChannel)
             return;
         }
 
-	DoSocialCheck(oUser, oTarget, sSkill);
+        int iOpposed = GetOpposedSocialSkillCheck(oTarget);
+        int iDifference = iCheck - iOpposed; // positive = user won
+
+        //Returns the message that should be logged to the DM
+    	sMessageForDM += SendSocialMessage(oUser, oTarget, sSkill);
+        AssignCommand(oUser, SpeakString(sMessageForDM, TALKVOLUME_SILENT_SHOUT));
     }
     else
     {
@@ -230,11 +309,12 @@ void DeathLevelCommand(object oUser, string sText)
     }
 
     sPCList = GetStringLeft(sPCList, GetStringLength(sPCList)-2);
-
     SendMessageToPC(oUser, "DM Death level for PCs in area set to " + sText + ": " +
         sLevel);
+
     if(iLevel > 0)
     {
+        //Maybe Death level should be reverted to 0 if no DM is online at the time? in onEnter or something?
         SendMessageToPC(oUser, "WARNING: You MUST set the death level to 0 " +
             "for all affected PCs once your event is complete. Affected PCs: " +
             sPCList);
