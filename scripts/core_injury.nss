@@ -3,6 +3,8 @@
 #include "core_pc_token"
 
 
+#include "core_pc_token"
+
 // --------- Initialization -----------
 void ApplyInjuryHP(object oPC);
 int GetInjuryHPCap(object oPC);
@@ -19,7 +21,11 @@ void ApplyInjuryHP(object oPC)
     
     if(GetCurrentHitPoints(oPC) > iInjuryHP)
     {
+<<<<<<< HEAD
     	SetCurrentHitPoints(oPC, iInjuryHP);
+=======
+    	return;// TODO: SetHP Via NWNX
+>>>>>>> Fixed some compiler errors
     }
 }
 

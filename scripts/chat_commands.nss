@@ -25,7 +25,7 @@ string SendSocialMessage(object oUser, object oTarget, int iDifference, string s
 
     //  Numbers should be 10, 4, -4, -10 as it's more statistically even
     
-    //Intimidate has a separate set of messages
+    // Intimidate has a separate set of messages
     if(sSkill == "itimidate")
     {
         if(iDifference <= -10) 
@@ -233,7 +233,11 @@ void SocialCommand(object oUser, string sText, int iChannel)
 
             int iOpposed = GetOpposedSocialSkillCheck(oTarget);
             iDifference = iCheck - iOpposed; // positive = user won
+<<<<<<< HEAD
             sMessageForDM += SendSocialMessage(oUser, oTarget, iDifference, sSkill);
+=======
+            sMessageForDM = sMessageForDM + SendSocialMessage(oUser, oTarget, sSkill);
+>>>>>>> Fixed some compiler errors
         
             AssignCommand(oUser, SpeakString(sMessageForDM, TALKVOLUME_SILENT_SHOUT));
             
@@ -262,7 +266,11 @@ void SocialCommand(object oUser, string sText, int iChannel)
         iDifference = iCheck - iOpposed; // positive = user won
 
         //Returns the message that should be logged to the DM
+<<<<<<< HEAD
     	sMessageForDM += SendSocialMessage(oUser, oTarget, iDifference, sSkill);
+=======
+    	sMessageForDM = sMessageForDM + SendSocialMessage(oUser, oTarget, sSkill);
+>>>>>>> Fixed some compiler errors
         AssignCommand(oUser, SpeakString(sMessageForDM, TALKVOLUME_SILENT_SHOUT));
     }
     else
