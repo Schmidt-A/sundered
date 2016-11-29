@@ -1,5 +1,7 @@
+#include "nwnx_funcs"
 
 #include "core_pc_token"
+
 
 // --------- Initialization -----------
 void ApplyInjuryHP(object oPC);
@@ -17,7 +19,7 @@ void ApplyInjuryHP(object oPC)
     
     if(GetCurrentHitPoints(oPC) > iInjuryHP)
     {
-    	return;// TODO: SetHP Via NWNX
+    	SetCurrentHitPoints(oPC, iInjuryHP);
     }
 }
 

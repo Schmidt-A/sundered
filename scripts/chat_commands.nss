@@ -13,7 +13,7 @@
 /* Handles the message displayed to the user based on the dice roll difference
 
 */
-string SendSocialMessage(object oUser, object oTarget, int iDifference string sSkill)
+string SendSocialMessage(object oUser, object oTarget, int iDifference, string sSkill)
 {
 
     //  TODO: Messages to the user??
@@ -25,7 +25,7 @@ string SendSocialMessage(object oUser, object oTarget, int iDifference string sS
 
     //  Numbers should be 10, 4, -4, -10 as it's more statistically even
     
-    // Intimidate has a separate set of messages
+    //Intimidate has a separate set of messages
     if(sSkill == "itimidate")
     {
         if(iDifference <= -10) 
@@ -104,7 +104,7 @@ string SendSocialMessage(object oUser, object oTarget, int iDifference string sS
     
     // Log to DMs. Actually sent after the returned function since this just compiles the target list
     string sResult = (iDifference >= 0) ? "succeeded" : "failed";
-    string sLog = " | " + sResult + " against " + + GetName(oTarget) + " by " + IntToString(abs(iDifference));
+    string sLog = " | " + sResult + " against " + GetName(oTarget) + " by " + IntToString(abs(iDifference));
     
     return sLog;
 }
@@ -233,7 +233,7 @@ void SocialCommand(object oUser, string sText, int iChannel)
 
             int iOpposed = GetOpposedSocialSkillCheck(oTarget);
             iDifference = iCheck - iOpposed; // positive = user won
-            sMessageForDM = sMessageForDM + SendSocialMessage(oUser, oTarget, sSkill);
+            sMessageForDM += SendSocialMessage(oUser, oTarget, iDifference, sSkill);
         
             AssignCommand(oUser, SpeakString(sMessageForDM, TALKVOLUME_SILENT_SHOUT));
             
@@ -262,7 +262,7 @@ void SocialCommand(object oUser, string sText, int iChannel)
         iDifference = iCheck - iOpposed; // positive = user won
 
         //Returns the message that should be logged to the DM
-    	sMessageForDM = sMessageForDM + SendSocialMessage(oUser, oTarget, sSkill);
+    	sMessageForDM += SendSocialMessage(oUser, oTarget, iDifference, sSkill);
         AssignCommand(oUser, SpeakString(sMessageForDM, TALKVOLUME_SILENT_SHOUT));
     }
     else
