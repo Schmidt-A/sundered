@@ -3,6 +3,7 @@
 #include "nwnx_chat"
 
 #include "core_pc_token"
+
 #include "core_injury"
 
 void main()
@@ -24,6 +25,6 @@ void main()
         }
 
         //Apply reduction in Injury HP to a full health character
-        ApplyInjuryHP();
+        ApplyInjuryHP(oPC);
     }
 }

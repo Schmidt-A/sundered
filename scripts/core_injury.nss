@@ -1,4 +1,6 @@
 
+#include "core_pc_token"
+
 // --------- Initialization -----------
 void ApplyInjuryHP(object oPC);
 int GetInjuryHPCap(object oPC);
@@ -9,27 +11,29 @@ int GetInjuryHPCap(object oPC);
 /*
 	This applies the reduction in HP to a full health character
 */
-void ApplyInjuryHP(oPC)
+void ApplyInjuryHP(object oPC)
 {
     int iInjuryHP = GetInjuryHPCap(oPC);
     
-    if(GetCurrentHitPoints(oPC) > iMaxHP)
+    if(GetCurrentHitPoints(oPC) > iInjuryHP)
     {
-    	// TODO: SetHP Via NWNX
+    	return;// TODO: SetHP Via NWNX
     }
 }
 
 /*
 	This returns the maximum amount of HP a character can have based on 
 	the injuries that they've accrued.
+
+	Needs to be called by the EffectHeal in the nwscript.nss
 */
-int GetInjuryHPCap(oPC)
+int GetInjuryHPCap(object oPC)
 {
 	int iInjuries = PCDGetInjuries(oPC);
 	int iMaxHP = GetMaxHitPoints(oPC);
 	int iInjuryHP = iMaxHP;
 
-    if(PCDGetInjuries > 0)
+    if(iInjuries > 0)
     {
     	// TODO: Handle rounding
     	// Each injury lowers the max hp by 5%

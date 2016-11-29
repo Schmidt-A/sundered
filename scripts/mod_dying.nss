@@ -19,7 +19,9 @@ void Unconsciousness(object oPC)
 void Injury(object oPC)
 {
     PCDAddInjury(oPC);
+    
     // TODO: Message
+    SendMessageToPC(oPC, "You've taken an arrow to the knee");
 }
 
 void Bleed(int iBleedAmt)
